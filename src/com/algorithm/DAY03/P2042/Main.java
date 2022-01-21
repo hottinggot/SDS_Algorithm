@@ -27,7 +27,6 @@ public class Main {
             num[i] = Long.parseLong(st.nextToken());
         }
 
-
         while(s<n) {
             s *= 2;
         }
