@@ -83,8 +83,6 @@ public class Main {
                 flag = !flag;
                 maxNum = 0;
             }
-
-
         }
 
 
