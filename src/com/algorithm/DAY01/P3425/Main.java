@@ -10,12 +10,12 @@ public class Main {
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st;
+        boolean firstInput = true;
 
         while(true) {
             int n = 0;
             boolean isCmd = true;
             boolean isN = true;
-            boolean isQuit = false;
             List<String> list = new ArrayList<>();
             while (true) {
                 String str = "";
@@ -25,8 +25,7 @@ public class Main {
                 }
 
                 if(str.equals("QUIT")) {
-                    isQuit = true;
-                    break;
+                    return;
                 }
 
                 else if(str.equals("END")) {
@@ -45,6 +44,7 @@ public class Main {
                         n = Integer.parseInt(str);
                         isN = false;
                     } else {
+                        if(!firstInput) System.out.println();
                         for(int i=0; i<n; i++) {
                             st = new StringTokenizer(br.readLine());
                             long v = Long.parseLong(st.nextToken());
@@ -116,14 +116,13 @@ public class Main {
                             }
                         }
                         br.readLine();
-                        System.out.println();
                         break;
                     }
 
                 }
 
             }
-            if(isQuit) break;
+            firstInput = false;
         }
     }
 
@@ -162,7 +161,8 @@ class GoStack {
 
     public boolean inv() {
         if(!isEmpty()) {
-            list.set(list.size()-1, list.get(list.size()-1)*(-1));
+            long res = pop();
+            num(res * (-1));
             return true;
         }
         return false;
@@ -170,7 +170,8 @@ class GoStack {
 
     public boolean dup() {
         if(!isEmpty()) {
-            list.add(list.get(list.size()-1));
+            long res = list.get(list.size()-1);
+            num(res);
             return true;
         }
         return false;
@@ -180,8 +181,8 @@ class GoStack {
         if(canCalculate()) {
             long first = pop();
             long second = pop();
-            list.add(first);
-            list.add(second);
+            num(first);
+            num(second);
             return true;
         }
         return false;
@@ -189,10 +190,11 @@ class GoStack {
 
     public boolean add() {
         if(canCalculate()) {
-            long top = pop();
-            long res = list.get(list.size()-1) + top;
+            long first = pop();
+            long second = pop();
+            long res = first + second;
             if(Math.abs(res) > 1e9) return false;
-            list.set(list.size()-1, res);
+            num(res);
             return true;
         }
         return false;
@@ -200,10 +202,11 @@ class GoStack {
 
     public boolean sub() {
         if(canCalculate()) {
-            long top = pop();
-            long res = list.get(list.size()-1) - top;
+            long first = pop();
+            long second = pop();
+            long res = second - first;
             if(Math.abs(res) > 1e9) return false;
-            list.set(list.size()-1, res);
+            num(res);
             return true;
         }
         return false;
@@ -211,10 +214,11 @@ class GoStack {
 
     public boolean mul() {
         if(canCalculate()) {
-            long top = pop();
-            long res = top * list.get(list.size()-1);
+            long first = pop();
+            long second = pop();
+            long res = first * second;
             if(Math.abs(res) > 1e9) return false;
-            list.set(list.size()-1, res);
+            num(res);
             return true;
         }
         return false;
@@ -222,15 +226,13 @@ class GoStack {
 
     public boolean div() {
         if(canCalculate()) {
-            long top = pop();
-            if(top==0) return false;
-            long res = Math.abs(list.get(list.size()-1)) / Math.abs(top);
+            long first = pop();
+            if(first==0) return false;
+            long second = pop();
+            long res = second/first;
             if(Math.abs(res) > 1e9) return false;
-            if((list.get(list.size()-1) < 0 && top >0) || (list.get(list.size()-1) > 0 && top < 0)) {
-                res *= -1;
-            }
 
-            list.set(list.size()-1, res);
+            num(res);
             return true;
         }
         return false;
@@ -238,18 +240,20 @@ class GoStack {
 
     public boolean mod() {
         if(canCalculate()) {
-            long top = pop();
-            if(top==0) return false;
-            long res = Math.abs(list.get(list.size()-1)) % Math.abs(top);
+            long first = pop();
+            if(first==0) return false;
+            long second = pop();
+            long res = Math.abs(second) % Math.abs(first);
             if(Math.abs(res) > 1e9) return false;
-            if(list.get(list.size()-1) < 0) {
+            if(second < 0) {
                 res *= -1;
             }
 
-            list.set(list.size()-1,  res);
+            num(res);
             return true;
         }
         return false;
     }
 
 }
+
