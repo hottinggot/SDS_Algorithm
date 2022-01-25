@@ -10,9 +10,9 @@ import java.util.StringTokenizer;
 class Edge {
     int from;
     int to;
-    int weight;
+    long weight;
 
-    public Edge(int from, int to, int weight) {
+    public Edge(int from, int to, long weight) {
         this.from = from;
         this.to = to;
         this.weight = weight;
@@ -20,7 +20,7 @@ class Edge {
 }
 
 public class Main {
-    static int INF = (int) 1e7;
+    static long INF = (int) 1e7;
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
@@ -34,12 +34,12 @@ public class Main {
             st = new StringTokenizer(br.readLine());
             int a = Integer.parseInt(st.nextToken());
             int b = Integer.parseInt(st.nextToken());
-            int c = Integer.parseInt(st.nextToken());
+            long c = Long.parseLong(st.nextToken());
 
             list.add(new Edge(a, b, c));
         }
 
-        int [] dist = new int[n+1];
+        long [] dist = new long[n+1];
 
         for(int i=2; i<=n; i++) {
             dist[i] = INF;
