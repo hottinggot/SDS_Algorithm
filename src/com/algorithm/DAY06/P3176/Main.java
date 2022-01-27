@@ -23,7 +23,8 @@ public class Main {
     static List<Node>[] tree;
     static int [] depth;
     static int [][] parents;
-    static int [][] distanceToNthParents;
+    static int [][] maxDistance;
+    static int [][] minDistance;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -36,6 +37,10 @@ public class Main {
 
         int s = 0;
 
+        for(int i=0; i<=n; i++) {
+            tree[i] = new ArrayList<>();
+        }
+
         int tempNum = 1;
         while(tempNum < n) {
             tempNum *= 2;
@@ -43,11 +48,8 @@ public class Main {
         }
 
         parents = new int[s+1][n+1];
-        distanceToNthParents = new int[s+1][n+1];
-
-        for(int i=1; i<=n; i++) {
-            tree[i] = new ArrayList<>();
-        }
+        maxDistance = new int[s+1][n+1];
+        minDistance = new int[s+1][n+1];
 
         for(int i=0; i<n-1; i++) {
             st = new StringTokenizer(br.readLine());
@@ -60,20 +62,13 @@ public class Main {
             tree[b].add(new Node(a, c));
         }
 
-        boolean[] findRoot = new boolean[n+1];
-
-        for(int i=1; i<=n; i++) {
-            for(Node node: tree[i]) {
-                findRoot[node.x] = true;
-            }
-        }
-
         initBFS(new Node(1, 0));
 
         for(int i=1; i<=s; i++) {
             for(int j=1; j<=n; j++) {
                 parents[i][j] = parents[i-1][parents[i-1][j]];
-                distanceToNthParents[i][j] += distanceToNthParents[i-1][parents[i-1][j]];
+                maxDistance[i][j] = Math.max(maxDistance[i-1][j], maxDistance[i-1][parents[i-1][j]]);
+                minDistance[i][j] = Math.min(minDistance[i-1][j], minDistance[i-1][parents[i-1][j]]);
             }
         }
 
@@ -85,54 +80,52 @@ public class Main {
             int e = Integer.parseInt(st.nextToken());
 
             int diff = 0;
-            int cost = 0;
 
-            int minVal = 0;
+            int minVal = Integer.MAX_VALUE;
             int maxVal = 0;
 
             if(depth[d] > depth[e]) {
                 diff = depth[d] - depth[e];
 
-                for(int j=1; j<=s; j++) {
+                for(int j=0; j<=s; j++) {
                     if((diff & (1 << j)) >= 1) {
+                        maxVal = Math.max(maxVal, maxDistance[j][d]);
+                        minVal = Math.min(minVal, minDistance[j][d]);
                         d = parents[j][d];
-                        cost += distanceToNthParents[j][d];
                     }
                 }
+
             } else if(depth[d] < depth[e]) {
                 diff = depth[e] - depth[d];
 
-                for(int j=1; j<=s; j++) {
+                for(int j=0; j<=s; j++) {
                     if((diff & (1 << j)) >= 1) {
+                        maxVal = Math.max(maxVal, maxDistance[j][e]);
+                        minVal = Math.min(minVal, minDistance[j][e]);
                         e = parents[j][e];
-                        cost += distanceToNthParents[j][e];
                     }
                 }
             }
 
             if(d==e) {
-                minVal = cost;
-                maxVal = cost;
                 System.out.println(minVal + " " + maxVal);
                 continue;
             }
 
             for(int j=s; j>=0; j--) {
                 if(parents[j][d] != parents[j][e]) {
+                    maxVal = Math.max(maxVal, Math.max(maxDistance[j][d], maxDistance[j][e]));
+                    minVal = Math.min(minVal, Math.min(minDistance[j][d], minDistance[j][e]));
                     d = parents[j][d];
-                    cost += distanceToNthParents[j][d];
-
                     e = parents[j][e];
-                    cost += distanceToNthParents[j][e];
+
                 }
             }
 
-            d = parents[0][d];
-            e = parents[0][e];
-            cost += distanceToNthParents[0][d];
-            cost += distanceToNthParents[0][e];
+            maxVal = Math.max(maxVal, Math.max(maxDistance[0][d], maxDistance[0][e]));
+            minVal = Math.min(minVal, Math.min(minDistance[0][d], minDistance[0][e]));
 
-            System.out.println(d + " " + cost);
+            System.out.println(minVal + " " + maxVal);
 
         }
     }
@@ -141,11 +134,11 @@ public class Main {
         Queue<Node> queue = new LinkedList<>();
         boolean [] check = new boolean[n+1];
         queue.add(start);
-        int d = 0;
+        check[start.x] = true;
+
         while (!queue.isEmpty()) {
             int now = queue.peek().x;
             int dist = queue.peek().dist;
-            depth[now] = d++;
 
             queue.poll();
 
@@ -155,7 +148,9 @@ public class Main {
 
                 if(!check[next]) {
                     parents[0][next] = now;
-                    distanceToNthParents[0][next] = nextDist;
+                    maxDistance[0][next] = nextDist;
+                    minDistance[0][next] = nextDist;
+                    depth[next] = depth[now] + 1;
                     check[next] = true;
                     queue.add(tree[now].get(i));
                 }
