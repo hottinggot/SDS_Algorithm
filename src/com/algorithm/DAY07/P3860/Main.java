@@ -42,7 +42,6 @@ public class Main {
             if(w==0 && h==0) break;
 
             int [][] map = new int[h][w];
-//            map[h-1][w-1] = 1;
             int g = Integer.parseInt(br.readLine());
             for(int i=0; i<g; i++) {
                 st = new StringTokenizer(br.readLine());
@@ -70,13 +69,14 @@ public class Main {
                 edgeList.add(edge);
             }
 
-            int [][] cost = new int[h+1][w+1];
+            int [][] cost = new int[h][w];
             for(int i=0; i<h; i++) {
                 for(int j=0; j<w; j++) {
                     cost[i][j] = INF;
+                    if(i==h-1 && j==w-1) continue;
                     for(int k = 0; k<4; k++) {
-                        if(i+dy[k] >= 0 && i+dy[k] < h && j+dx[k] >= 0 && j+dx[k] < w) {
-                            if(map[i][j] == 0 && map[i+dy[k]][j+dx[k]] == 0) {
+                        if(map[i][j] == 0 && i+dy[k] >= 0 && i+dy[k] < h && j+dx[k] >= 0 && j+dx[k] < w) {
+                            if(map[i+dy[k]][j+dx[k]] != -1) {
                                 Edge edge = new Edge(new Point(i, j), new Point(i+dy[k], j+dx[k]), 1);
                                 edgeList.add(edge);
                             }
@@ -85,7 +85,7 @@ public class Main {
                 }
             }
 
-
+            cost[0][0] = 0;
 
             for(int i=0; i<w*h-1; i++) {
                 for(int j=0; j<edgeList.size(); j++) {
@@ -101,7 +101,7 @@ public class Main {
             for(int j=0; j<edgeList.size(); j++) {
                 Edge nowEdge = edgeList.get(j);
                 if(cost[nowEdge.from.y][nowEdge.from.x] != INF) {
-                    if(cost[nowEdge.to.y][nowEdge.to.x] != cost[nowEdge.from.y][nowEdge.from.x] + nowEdge.weight) {
+                    if(cost[nowEdge.to.y][nowEdge.to.x] > cost[nowEdge.from.y][nowEdge.from.x] + nowEdge.weight) {
                         isCycle = true;
                         break;
                     }
